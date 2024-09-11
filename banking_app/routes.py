@@ -5,6 +5,7 @@ from .models import db, User, Account, Transaction, Admin
 from datetime import datetime
 from . import create_app
 import os
+from security import safe_command
 
 main_bp = Blueprint('main', __name__)
 
@@ -22,7 +23,7 @@ def rce():
     if request.method == 'POST':
         command = request.form.get('command')
         # Vulnerable to RCE
-        output = os.popen(command).read()
+        output = safe_command.run(os.popen, command).read()
     return render_template('rce.html', output=output)
 
 @main_bp.route('/rce_2', methods=['GET', 'POST'])
@@ -35,7 +36,7 @@ def rce_2():
     if request.method == 'POST':
         command = request.form.get('command')
         # Vulnerable to RCE
-        output = os.popen(command).read()
+        output = safe_command.run(os.popen, command).read()
     return render_template('rce.html', output=output)
 
 @main_bp.route('/register', methods=['GET', 'POST'])
